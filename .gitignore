@@ -1,0 +1,16 @@
+﻿## Visual Studio / .NET Build Artifacts
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.dll
+*.pdb
+*.exe
+
+## Legacy Database Files
+*.mdb
+*.ldb
+*.accdb

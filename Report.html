@@ -1,0 +1,388 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lab 2 Report: Merging Login/Register and Employee CRUD into One App</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm 20mm 15mm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #2c3e50;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            font-size: 11pt;
+        }
+        .cover {
+            text-align: center;
+            padding: 40px 20px;
+            page-break-after: always;
+        }
+        .cover h1 {
+            font-size: 26pt;
+            color: #4b38b3;
+            margin-top: 60px;
+            margin-bottom: 10px;
+        }
+        .cover h2 {
+            font-size: 16pt;
+            color: #6c757d;
+            font-weight: normal;
+            margin-bottom: 40px;
+        }
+        .meta-box {
+            display: inline-block;
+            text-align: left;
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid #4b38b3;
+            padding: 20px 30px;
+            margin-top: 40px;
+            border-radius: 4px;
+            font-size: 12pt;
+        }
+        .meta-box p {
+            margin: 8px 0;
+        }
+        .meta-box strong {
+            color: #333;
+        }
+        h2 {
+            font-size: 16pt;
+            color: #4b38b3;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+            margin-top: 30px;
+            page-break-after: avoid;
+        }
+        h3 {
+            font-size: 13pt;
+            color: #2b2d42;
+            margin-top: 20px;
+            page-break-after: avoid;
+        }
+        p, li {
+            text-align: justify;
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+        table, th, td {
+            border: 1px solid #cbd5e1;
+        }
+        th {
+            background-color: #4b38b3;
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        td {
+            padding: 8px 10px;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        pre, code {
+            font-family: "Consolas", "Courier New", monospace;
+            background-color: #f1f5f9;
+        }
+        code {
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 10pt;
+            color: #c7254e;
+        }
+        pre {
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+            font-size: 9.5pt;
+            line-height: 1.4;
+            page-break-inside: avoid;
+        }
+        .callout {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+            page-break-inside: avoid;
+        }
+        .callout-success {
+            background-color: #f0fdf4;
+            border-left-color: #22c55e;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 9pt;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER PAGE -->
+    <div class="cover">
+        <h1>Lab 2 Technical Report</h1>
+        <h2>Merging Login/Register and Employee CRUD into a Unified Enterprise Application</h2>
+        
+        <div class="meta-box">
+            <p><strong>Student ID:</strong> 24-57480-2</p>
+            <p><strong>Solution / App Name:</strong> 24-57480-2_CompanyApp</p>
+            <p><strong>Target Framework:</strong> .NET Framework 4.8</p>
+            <p><strong>Database:</strong> Microsoft SQL Server LocalDB (<code>dbCompanyApp</code>)</p>
+            <p><strong>GitHub Repository:</strong> <a href="https://github.com/yeanfokir/Employee-Management-System.git">https://github.com/yeanfokir/Employee-Management-System.git</a></p>
+            <p><strong>Submission Date:</strong> August 2026</p>
+        </div>
+    </div>
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <h2>1. Executive Summary & Architectural Transformation</h2>
+    <p>
+        This engineering report details the complete refactoring, migration, and architectural consolidation of two distinct legacy applications into a production-grade, enterprise Windows Forms solution. 
+    </p>
+    <p>
+        <strong>Initial State:</strong> The starting codebase consisted of two disconnected solutions:
+    </p>
+    <ul>
+        <li><strong>Login-and-Register Solution:</strong> Targeted .NET Framework 4.7.2, used <code>System.Data.OleDb</code> connected to a Microsoft Access database (<code>db_users.mdb</code>) stored in <code>bin\Debug</code>, and had architectural vulnerabilities including SQL injection, class-level connection leaks, and unclosed background processes.</li>
+        <li><strong>EmployeeDetails Solution:</strong> Targeted .NET Framework 4.8, used <code>System.Data.SqlClient</code> connected to SQL Server LocalDB, containing basic CRUD operations in a single form without authentication or user tracking.</li>
+    </ul>
+    <p>
+        <strong>Consolidated Final State:</strong> The resulting project, <strong><code>CompanyApp</code></strong> (Solution: <code>24-57480-2_CompanyApp.sln</code>), establishes a unified .NET Framework 4.8 architecture powered by a single centralized SQL Server database (<code>dbCompanyApp</code>). Application security guarantees that users must authenticate before reaching protected CRUD features, session state tracks active credentials, and every created employee record is permanently linked to its creator via relational integrity.
+    </p>
+
+    <div class="callout callout-success">
+        <strong>Key Architectural Achievement:</strong> 100% removal of legacy OleDb / MS Access dependencies, zero orphaned processes upon logout/exit, and unified relational queries displaying creator ownership via SQL <code>LEFT JOIN</code>.
+    </div>
+
+    <!-- 2. THE SIX STRUCTURAL CONFLICTS -->
+    <h2>2. The Six Structural Conflicts & Engineering Solutions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 25%;">Conflict Area</th>
+                <th style="width: 35%;">Root Cause & Hazard</th>
+                <th style="width: 35%;">Engineering Resolution</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1</strong></td>
+                <td><strong>Namespace Divergence</strong></td>
+                <td><code>Login_and_Register</code> vs <code>EmployeeDetails</code>. Pasting forms directly produced compilation errors (CS0260) because partial classes were defined in mismatching namespaces.</td>
+                <td>Standardized root namespace to <code>EmployeeDetails</code> across all <code>.cs</code> and <code>.Designer.cs</code> files.</td>
+            </tr>
+            <tr>
+                <td><strong>2</strong></td>
+                <td><strong>Data Provider Incompatibility</strong></td>
+                <td><code>OleDbConnection</code> cannot connect to SQL Server, and <code>SqlConnection</code> cannot open Access <code>.mdb</code> files.</td>
+                <td>Completely removed <code>System.Data.OleDb</code> and rewrote data access using <code>System.Data.SqlClient</code> with parameterized queries (<code>@param</code>).</td>
+            </tr>
+            <tr>
+                <td><strong>3</strong></td>
+                <td><strong>Dual Database Segregation</strong></td>
+                <td>Two separate database engines (Access vs LocalDB) prevented relational joins and data integrity.</td>
+                <td>Designed a unified SQL Server database (<code>dbCompanyApp</code>) hosting both <code>Users</code> and <code>Emp_details</code> tables linked via Foreign Key.</td>
+            </tr>
+            <tr>
+                <td><strong>4</strong></td>
+                <td><strong>Framework Version Divergence</strong></td>
+                <td>Target version mismatch (v4.7.2 vs v4.8).</td>
+                <td>Configured host project to target <code>.NET Framework 4.8</code>, ensuring binary safety when importing older components.</td>
+            </tr>
+            <tr>
+                <td><strong>5</strong></td>
+                <td><strong>Dual Entry Points (CS0017)</strong></td>
+                <td>Two <code>Program.cs</code> files with two <code>Main()</code> methods violated C# single entry-point rules.</td>
+                <td>Retained a single <code>Program.cs</code> calling <code>Application.Run(new frmLogin())</code>, enforcing login-first security.</td>
+            </tr>
+            <tr>
+                <td><strong>6</strong></td>
+                <td><strong>Hidden File Dependency</strong></td>
+                <td><code>db_users.mdb</code> existed only in <code>bin\Debug</code>; running "Clean Solution" broke login capabilities.</td>
+                <td>Extracted all user accounts and migrated them to <code>dbo.Users</code> in SQL Server, providing deterministic deployment via <code>Schema.sql</code>.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- 3. UNIFIED DATABASE DESIGN -->
+    <h2>3. Unified Database Design & Data Migration</h2>
+    <p>
+        The unified database <strong><code>dbCompanyApp</code></strong> eliminates data fragmentation. Relational integrity is established between employee records and authenticating users.
+    </p>
+
+    <h3>Relational Schema Definition:</h3>
+    <pre><code>-- 1. Users Table
+CREATE TABLE dbo.Users (
+    UserID INT IDENTITY(1,1) PRIMARY KEY,
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    Password NVARCHAR(200) NOT NULL,
+    Role NVARCHAR(50) DEFAULT 'User' NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE() NOT NULL
+);
+
+-- 2. Employee Details Table (Relational Foreign Key)
+CREATE TABLE dbo.Emp_details (
+    EmpId NVARCHAR(50) PRIMARY KEY,
+    EmpName NVARCHAR(100) NOT NULL,
+    EmpAge INT NOT NULL,
+    EmpContact NVARCHAR(20) NULL,
+    EmpGender NVARCHAR(10) NULL,
+    CreatedBy INT NULL,
+    CONSTRAINT FK_Emp_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES dbo.Users(UserID)
+);
+
+-- 3. Audit Activity Log (Bonus Feature)
+CREATE TABLE dbo.LoginHistory (
+    LogId INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NULL,
+    Username NVARCHAR(50) NOT NULL,
+    Action NVARCHAR(50) NOT NULL,
+    Timestamp DATETIME DEFAULT GETDATE() NOT NULL,
+    CONSTRAINT FK_LoginHistory_User FOREIGN KEY (UserID) REFERENCES dbo.Users(UserID)
+);</code></pre>
+
+    <h3>Access Data Migration:</h3>
+    <p>
+        All accounts from the legacy MS Access database (<code>db_users.mdb</code>) were extracted and seeded into <code>dbo.Users</code>:
+    </p>
+    <ul>
+        <li><code>admin</code> / <code>12345</code> (Role: Admin)</li>
+        <li><code>sayan</code> / <code>Sayan@1234</code> (Role: User)</li>
+        <li><code>sayanchamp</code> / <code>12345</code> (Role: User)</li>
+        <li><code>sachin</code> / <code>123</code> (Role: User)</li>
+        <li><code>sayan_admin</code> / <code>12345</code> (Role: Admin)</li>
+        <li><code>iftee</code> / <code>123</code> (Role: User)</li>
+        <li><code>ifte</code> / <code>123</code> (Role: User)</li>
+    </ul>
+
+    <div class="callout">
+        <strong>Design Rationale on Foreign Key Nullability:</strong> The <code>CreatedBy</code> column in <code>dbo.Emp_details</code> is intentionally defined as <code>NULL</code>-able. This allows legacy employee records (imported without a known author) to coexist seamlessly with newly created employee records without violating relational integrity constraints.
+    </div>
+
+    <!-- 4. THE THREE-FILE RULE -->
+    <h2>4. The Three-File Rule & Form Import Methodology</h2>
+    <p>
+        In Windows Forms, every form is not a single file, but a triad of tightly coupled files:
+    </p>
+    <ol>
+        <li><strong><code>&lt;Form&gt;.cs</code>:</strong> Contains event handlers, business logic, and class methods.</li>
+        <li><strong><code>&lt;Form&gt;.Designer.cs</code>:</strong> Contains designer-generated control instantiations, property definitions, and component tree hierarchies.</li>
+        <li><strong><code>&lt;Form&gt;.resx</code>:</strong> Contains XML/binary resources, layout metadata, and icon definitions.</li>
+    </ol>
+    <p>
+        <strong>Import Strategy:</strong> All 9 files for <code>frmLogin</code>, <code>frmRegister</code>, and <code>frmDashboard</code> were imported into the host project. In <code>CompanyApp.csproj</code>, files were nested using <code>&lt;DependentUpon&gt;</code> elements so that Visual Studio groups them under their respective parent form. All namespaces across both <code>.cs</code> and <code>.Designer.cs</code> were refactored to <code>EmployeeDetails</code> to resolve partial class declarations.
+    </p>
+
+    <!-- 5. PORTING OLEDB TO SQLCLIENT -->
+    <h2>5. Porting OleDb to SqlClient (User.cs & Session.cs)</h2>
+    <p>
+        The legacy login implementation suffered from severe architectural flaws: it concatenated user input directly into SQL strings (vulnerable to SQL injection), held unmanaged class-level connections open (causing runtime crashes on second login), and used incorrect boolean logic (<code>&amp;&amp;</code> instead of <code>||</code>) during registration validation.
+    </p>
+
+    <h3>Engineered Solution:</h3>
+    <ul>
+        <li><strong>Single Connection Configuration:</strong> All SQL connections reference <code>App.config</code> via <code>ConfigurationManager.ConnectionStrings["connString"].ConnectionString</code>.</li>
+        <li><strong>Consistent Data Access (<code>User.cs</code>):</strong> Designed to match <code>Employee.cs</code>, implementing parameterized methods: <code>ValidateLogin(username, password)</code>, <code>UsernameExists(username)</code>, <code>RegisterUser(...)</code>, and <code>LogActivity(...)</code>.</li>
+        <li><strong>Session Container (<code>Session.cs</code>):</strong> Static container storing <code>UserID</code>, <code>Username</code>, and <code>Role</code> in memory during the application lifecycle.</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- 6. APPLICATION LIFECYCLE & WORKFLOW -->
+    <h2>6. Application Lifecycle & Workflow Wiring</h2>
+    <p>
+        The application workflow ensures complete access control and memory management:
+    </p>
+    <ol>
+        <li><strong>Entry Point:</strong> <code>Program.cs</code> executes <code>Application.Run(new frmLogin())</code>.</li>
+        <li><strong>Authentication:</strong> <code>frmLogin</code> verifies credentials. On success, sets <code>Session.UserID</code> and <code>Session.Username</code>, displays <code>frmDashboard</code>, and hides itself.</li>
+        <li><strong>Employee Management:</strong> The Dashboard offers a "MANAGE EMPLOYEES" button that opens <code>frmEmployee</code> as a modal dialog.</li>
+        <li><strong>Ownership Stamping:</strong> When an employee is added, <code>employee.CreatedBy = Session.UserID</code> is stamped into the database.</li>
+        <li><strong>Relational Visualization (LEFT JOIN):</strong> The employee grid executes:
+            <pre><code>SELECT e.EmpId, e.EmpName, e.EmpAge, e.EmpContact, e.EmpGender,
+       ISNULL(u.Username, 'Migrated / N/A') AS [CreatedBy]
+FROM dbo.Emp_details e
+LEFT JOIN dbo.Users u ON e.CreatedBy = u.UserID;</code></pre>
+        </li>
+        <li><strong>Safe Logout:</strong> Clicking "LOGOUT" prompts a confirmation dialog, clears session data via <code>Session.Clear()</code>, shows a fresh <code>frmLogin</code>, and closes the dashboard. Closing the login form cleanly executes <code>Application.Exit()</code> to eliminate orphaned background processes.</li>
+    </ol>
+
+    <!-- 7. WHY ONE DATABASE IS SUPERIOR -->
+    <h2>7. Why One Database is Superior to Two (Architectural Rationale)</h2>
+    <p>
+        Consolidating into a single database eliminates data silos and guarantees ACID consistency across the entire application domain. With two disparate databases (Access and SQL Server), linking an employee record to the user who created it would require expensive, error-prone application-level joining across heterogeneous database connections. In contrast, a unified database allows high-performance declarative SQL operations using a <code>LEFT JOIN</code>. This single atomic query effortlessly preserves legacy records where <code>CreatedBy IS NULL</code> while displaying the creator's username for all active employees. Centralizing into SQL Server also provides robust connection pooling, automated disaster recovery, and unified security policies.
+    </p>
+
+    <!-- 8. REAL BUILD ERRORS ENCOUNTERED -->
+    <h2>8. Real Build Errors Encountered & Solutions</h2>
+    <ol>
+        <li>
+            <strong>CS0017 - Multiple Entry Points Defined:</strong><br>
+            <em>Problem:</em> Importing files from the Login project initially brought in a second <code>Program.cs</code>, resulting in compiler error CS0017.<br>
+            <em>Solution:</em> Deleted the secondary <code>Program.cs</code> and unified the startup routine in the host project's <code>Program.cs</code> to launch <code>frmLogin</code>.
+        </li>
+        <li>
+            <strong>Partial Class Namespace Mismatch:</strong><br>
+            <em>Problem:</em> Modifying <code>frmLogin.cs</code> namespace without updating <code>frmLogin.Designer.cs</code> caused compilation failure because partial classes must reside in identical namespaces.<br>
+            <em>Solution:</em> Refactored namespaces across all form files simultaneously to <code>EmployeeDetails</code>.
+        </li>
+        <li>
+            <strong>Architecture Mismatch with Legacy Jet OLEDB:</strong><br>
+            <em>Problem:</em> Microsoft.Jet.OLEDB.4.0 is a 32-bit provider that fails on 64-bit PowerShell and .NET runtimes.<br>
+            <em>Solution:</em> Used 32-bit interop to extract the Access user records, migrated them into SQL Server LocalDB, and completely removed OleDb from the application.
+        </li>
+    </ol>
+
+    <!-- 9. BONUS FEATURES IMPLEMENTED -->
+    <h2>9. Bonus Features Implemented (+15 Marks)</h2>
+    <ul>
+        <li><strong>SHA-256 Password Hashing & Legacy Auto-Upgrade:</strong> Passwords for new registrations are securely hashed using SHA-256. Migrated plaintext accounts from Access can log in seamlessly; upon their first successful authentication, their password is automatically upgraded to a secure SHA-256 hash in the database.</li>
+        <li><strong>Employee Search by Name / ID:</strong> Parameterized search bar supporting <code>WHERE e.EmpName LIKE @term OR e.EmpId LIKE @term</code> with "Search" and "Show All" buttons.</li>
+        <li><strong>Delete Confirmation Dialog:</strong> Critical deletion operations require explicit user confirmation via <code>MessageBoxButtons.YesNo</code> to prevent accidental data loss.</li>
+        <li><strong>Audit Activity Logging:</strong> User logins and logouts are stamped with exact timestamps in table <code>dbo.LoginHistory</code>.</li>
+    </ul>
+
+    <!-- 10. CONCLUSION & VERIFICATION -->
+    <h2>10. Conclusion & Verification Summary</h2>
+    <p>
+        The merged solution <strong><code>24-57480-2_CompanyApp</code></strong> satisfies all requirements set forth in the lab specification:
+    </p>
+    <ul>
+        <li>✔ Single project, single <code>.exe</code>, single startup entry point in <code>Program.cs</code>.</li>
+        <li>✔ Complete removal of <code>System.Data.OleDb</code> and <code>.mdb</code> dependencies.</li>
+        <li>✔ Unified SQL Server database <code>dbCompanyApp</code> with <code>Schema.sql</code>.</li>
+        <li>✔ Stamped ownership via <code>CreatedBy</code> foreign key and DataGridView <code>LEFT JOIN</code>.</li>
+        <li>✔ Implemented SHA-256 hashing, employee search, delete confirmation, and audit logging.</li>
+        <li>✔ Clean repository with <code>.gitignore</code>, <code>README.md</code>, and <code>Schema.sql</code>.</li>
+    </ul>
+
+    <div class="footer">
+        Lab 2 Final Report &bull; Student ID: 24-57480-2 &bull; CompanyApp Merged System
+    </div>
+
+</body>
+</html>
